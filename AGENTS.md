@@ -7,7 +7,13 @@ Unit converter app built with Python tkinter.
 ## Run
 
 ```bash
-python converter.py
+python3 converter.py
+```
+
+## Test
+
+```bash
+python3 test_converter.py
 ```
 
 ## Lint / Typecheck
@@ -18,3 +24,4 @@ No linter or type checker configured.
 
 - Code style: Python standard (PEP 8)
 - GUI: tkinter with ttk widgets
+- Tests: unittest framework

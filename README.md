@@ -6,12 +6,23 @@ A tkinter-based unit converter for mm, inches, and feet.
 ## Usage
 
 ```bash
-python converter.py
+python3 converter.py
+```
+
+## Testing
+
+Run unit tests for the core logic:
+
+```bash
+python3 test_converter.py
 ```
 
 ## Features
 
 - Real-time conversion between mm, inches, and feet
-- Supports fraction inches (e.g., `7' 3 1/2"`)
-- Copy values to clipboard
-- Clear all fields with button or `Esc` key
+- Supports positive and negative mixed dimensions (e.g., `7' 3 1/2"` or `-3 1/4"`)
+- Smart typing validation (retains other field values while typing partial characters, clearing only on invalid inputs)
+- Fraction-only input support (e.g., `1/2` or `1/2"`)
+- Interactive clipboard copying with visual confirmation ("Copied!")
+- Clear all fields with the "Clear" button or `Esc` key
+- Responsive GUI layout with sensible minimum window sizing constraints
