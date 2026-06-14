@@ -16,6 +16,7 @@ class UnitConverter:
         self.mm_var = tk.StringVar()
         self.inch_var = tk.StringVar()
         self.feet_var = tk.StringVar()
+        self.always_on_top_var = tk.BooleanVar(value=False)
         
         # Conversion factors
         self.MM_PER_INCH = 25.4
@@ -40,6 +41,7 @@ class UnitConverter:
         style = ttk.Style()
         style.configure("TLabel", font=("Arial", 12))
         style.configure("TEntry", font=("Arial", 12))
+        style.configure("TCheckbutton", font=("Arial", 12))
         
         # Main frame
         main_frame = ttk.Frame(self.root, padding="40")
@@ -61,8 +63,17 @@ class UnitConverter:
         ttk.Entry(main_frame, textvariable=self.feet_var, width=25, font=("Arial", 12), justify="right").grid(row=2, column=1, sticky=(tk.W, tk.E), pady=8)
         ttk.Button(main_frame, text="Copy", command=lambda: self.copy_value(self.feet_var)).grid(row=2, column=2, padx=5, pady=8)
         
+        # Always on top checkbox
+        self.always_on_top_cb = ttk.Checkbutton(
+            main_frame,
+            text="Always on Top",
+            variable=self.always_on_top_var,
+            command=self.toggle_always_on_top
+        )
+        self.always_on_top_cb.grid(row=3, column=0, columnspan=2, sticky=tk.W, pady=15)
+        
         # Clear button
-        ttk.Button(main_frame, text="Clear", command=self.clear_all).grid(row=3, column=1, pady=15)
+        ttk.Button(main_frame, text="Clear", command=self.clear_all).grid(row=3, column=2, padx=5, pady=15)
     
     def parse_feet_input(self, text):
         text = text.strip() if text else ""
@@ -151,6 +162,9 @@ class UnitConverter:
         self.inch_var.set("")
         self.feet_var.set("")
         self.updating = False
+        
+    def toggle_always_on_top(self):
+        self.root.attributes("-topmost", self.always_on_top_var.get())
 
 if __name__ == "__main__":
     root = tk.Tk()
