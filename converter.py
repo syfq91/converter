@@ -8,6 +8,10 @@ class UnitConverter:
         self.root.title("Unit Converter")
         self.root.geometry("750x300")
         
+        # Make the window layout responsive
+        self.root.columnconfigure(0, weight=1)
+        self.root.rowconfigure(0, weight=1)
+        
         # Variables
         self.mm_var = tk.StringVar()
         self.inch_var = tk.StringVar()
@@ -40,29 +44,30 @@ class UnitConverter:
         # Main frame
         main_frame = ttk.Frame(self.root, padding="40")
         main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        main_frame.columnconfigure(1, weight=1)  # Allow Entry widgets to expand
         
         # MM row
         ttk.Label(main_frame, text="mm:").grid(row=0, column=0, sticky=tk.W, padx=(0, 15), pady=8)
-        ttk.Entry(main_frame, textvariable=self.mm_var, width=25, font=("Arial", 12), justify="right").grid(row=0, column=1, pady=8)
+        ttk.Entry(main_frame, textvariable=self.mm_var, width=25, font=("Arial", 12), justify="right").grid(row=0, column=1, sticky=(tk.W, tk.E), pady=8)
         ttk.Button(main_frame, text="Copy", command=lambda: self.copy_value(self.mm_var)).grid(row=0, column=2, padx=5, pady=8)
         
         # Inch row
         ttk.Label(main_frame, text="in:").grid(row=1, column=0, sticky=tk.W, padx=(0, 15), pady=8)
-        ttk.Entry(main_frame, textvariable=self.inch_var, width=25, font=("Arial", 12), justify="right").grid(row=1, column=1, pady=8)
+        ttk.Entry(main_frame, textvariable=self.inch_var, width=25, font=("Arial", 12), justify="right").grid(row=1, column=1, sticky=(tk.W, tk.E), pady=8)
         ttk.Button(main_frame, text="Copy", command=lambda: self.copy_value(self.inch_var)).grid(row=1, column=2, padx=5, pady=8)
         
         # Feet row
         ttk.Label(main_frame, text="ft:").grid(row=2, column=0, sticky=tk.W, padx=(0, 15), pady=8)
-        ttk.Entry(main_frame, textvariable=self.feet_var, width=25, font=("Arial", 12), justify="right").grid(row=2, column=1, pady=8)
+        ttk.Entry(main_frame, textvariable=self.feet_var, width=25, font=("Arial", 12), justify="right").grid(row=2, column=1, sticky=(tk.W, tk.E), pady=8)
         ttk.Button(main_frame, text="Copy", command=lambda: self.copy_value(self.feet_var)).grid(row=2, column=2, padx=5, pady=8)
         
         # Clear button
         ttk.Button(main_frame, text="Clear", command=self.clear_all).grid(row=3, column=1, pady=15)
     
     def parse_feet_input(self, text):
+        text = text.strip() if text else ""
         if not text:
-            return 0
-        text = text.strip()
+            return 0.0
         # Try decimal format first (e.g., 7.23)
         try:
             return float(text)
@@ -95,7 +100,7 @@ class UnitConverter:
             denominator = int(match.group(3))
             fraction = numerator / denominator
             return (inches + fraction) / self.INCH_PER_FOOT
-        return 0
+        return None
     
     def convert(self, source):
         if self.updating:
@@ -104,17 +109,33 @@ class UnitConverter:
         self.updating = True
         try:
             if source == "mm":
-                value = float(self.mm_var.get()) if self.mm_var.get() else 0
-                self.inch_var.set(f"{value / self.MM_PER_INCH:.4f}")
-                self.feet_var.set(f"{value / (self.MM_PER_INCH * self.INCH_PER_FOOT):.4f}")
+                text = self.mm_var.get().strip()
+                if not text:
+                    self.inch_var.set("")
+                    self.feet_var.set("")
+                else:
+                    value = float(text)
+                    self.inch_var.set(f"{value / self.MM_PER_INCH:.4f}")
+                    self.feet_var.set(f"{value / (self.MM_PER_INCH * self.INCH_PER_FOOT):.4f}")
             elif source == "inch":
-                value = float(self.inch_var.get()) if self.inch_var.get() else 0
-                self.mm_var.set(f"{value * self.MM_PER_INCH:.4f}")
-                self.feet_var.set(f"{value / self.INCH_PER_FOOT:.4f}")
+                text = self.inch_var.get().strip()
+                if not text:
+                    self.mm_var.set("")
+                    self.feet_var.set("")
+                else:
+                    value = float(text)
+                    self.mm_var.set(f"{value * self.MM_PER_INCH:.4f}")
+                    self.feet_var.set(f"{value / self.INCH_PER_FOOT:.4f}")
             elif source == "feet":
-                value = self.parse_feet_input(self.feet_var.get())
-                self.mm_var.set(f"{value * self.MM_PER_INCH * self.INCH_PER_FOOT:.4f}")
-                self.inch_var.set(f"{value * self.INCH_PER_FOOT:.4f}")
+                text = self.feet_var.get().strip()
+                if not text:
+                    self.mm_var.set("")
+                    self.inch_var.set("")
+                else:
+                    value = self.parse_feet_input(text)
+                    if value is not None:
+                        self.mm_var.set(f"{value * self.MM_PER_INCH * self.INCH_PER_FOOT:.4f}")
+                        self.inch_var.set(f"{value * self.INCH_PER_FOOT:.4f}")
         except ValueError:
             pass
         finally:
